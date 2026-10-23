@@ -1,0 +1,1 @@
+{"version":3,"file":"Faculty.d.ts","sourceRoot":"","sources":["../../src/models/Faculty.ts"],"names":[],"mappings":"AAAA,OAAO,EAAiB,KAAK,EAAE,MAAM,UAAU,CAAC;AAEhD,MAAM,WAAW,QAAQ;IACvB,IAAI,EAAE,MAAM,CAAC;IAAC,KAAK,CAAC,EAAE,MAAM,CAAC;IAAC,WAAW,EAAE,MAAM,CAAC;IAAC,UAAU,EAAE,KAAK,CAAC,QAAQ,CAAC;IAAC,QAAQ,EAAE,OAAO,CAAC;CAClG;;;;;;AAcD,wBAAyD"}

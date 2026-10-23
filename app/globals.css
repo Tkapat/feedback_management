@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-primary-50: #EEF2FF;
+  --color-primary-100: #E0E7FF;
+  --color-primary-200: #C7D2FE;
+  --color-primary-500: #6366F1;
+  --color-primary-600: #4F46E5;
+  --color-primary-700: #4338CA;
+  --color-accent-500: #14B8A6;
+  --color-ink-900: #0F172A;
+  --color-ink-800: #1E293B;
+  --color-ink-700: #334155;
+  --color-ink-600: #475569;
+  --color-ink-500: #64748B;
+  --color-ink-400: #94A3B8;
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-info: #0EA5E9;
+  --color-danger: #DC2626;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-jakarta), system-ui, sans-serif;
+  --shadow-soft: 0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);
+  --shadow-lift: 0 12px 32px rgba(79,70,229,.15);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-slate-50 text-ink-900 antialiased;
+}
+h1, h2, h3 {
+  @apply font-display;
+}
+:focus-visible {
+  @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+}
+.card {
+  @apply rounded-2xl border border-slate-200 bg-white shadow-soft;
+}
+.input {
+  @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm transition placeholder:text-ink-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-100;
+}
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+}
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0 }
+  100% { background-position: 0 0 }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
 }
