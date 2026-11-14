@@ -10,6 +10,7 @@ import {
   GraduationCap,
   BookOpen,
   Settings,
+  Bell,
 } from "lucide-react";
 import type { Role } from "@/types";
 
@@ -23,6 +24,7 @@ export const STUDENT_NAV: NavItem[] = [
   { name: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
   { name: "Give Feedback", href: "/student/feedback/new", icon: FileText },
   { name: "History", href: "/student/feedback/history", icon: Clock },
+  { name: "Notifications", href: "/student/notifications", icon: Bell },
 ];
 
 export const ADMIN_NAV: NavItem[] = [

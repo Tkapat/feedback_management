@@ -1,16 +1,13 @@
-import type { FeedbackCategory, FeedbackStatus, FeedbackType } from "@/types";
+import type { FeedbackCategory, FeedbackStatus } from "@/types";
 
 export const CATEGORIES: { value: FeedbackCategory; label: string }[] = [
   { value: "teaching", label: "Teaching" },
   { value: "classroom", label: "Classroom" },
   { value: "laboratory", label: "Laboratory" },
+  { value: "faculty", label: "Faculty" },
+  { value: "library", label: "Library" },
+  { value: "cleanliness", label: "Cleanliness" },
   { value: "other", label: "Other services" },
-];
-
-export const FEEDBACK_TYPES: { value: FeedbackType; label: string }[] = [
-  { value: "appreciation", label: "Appreciation" },
-  { value: "complaint", label: "Complaint" },
-  { value: "suggestion", label: "Suggestion" },
 ];
 
 export const STATUSES: { value: FeedbackStatus; label: string }[] = [

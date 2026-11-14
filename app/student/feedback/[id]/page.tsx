@@ -4,6 +4,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import useFetch from "@/hooks/useFetch";
 import StatusTimeline from "@/components/student/StatusTimeline";
 import ReplyThread from "@/components/student/ReplyThread";
+import ImageGallery from "@/components/shared/ImageGallery";
 import Badge from "@/components/ui/Badge";
 import Skeleton from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
@@ -83,6 +84,7 @@ export default function FeedbackDetailPage({ params }: { params: Promise<{ id: s
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-500">Comment</h3>
             <p className="rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-ink-700">{item.comment}</p>
           </div>
+          <ImageGallery images={item.images} />
 
           {item.rating ? (
             <div className="mt-5">

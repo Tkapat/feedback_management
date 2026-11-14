@@ -126,7 +126,7 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | admin@college.edu | Admin@12345 |
+| Admin | admin@college.edu | Admin@123 |
 | Student | student@college.edu | Student@123 |
 
 Use the **Student | Admin** toggle on the login page.
@@ -189,4 +189,4 @@ Use the **Student | Admin** toggle on the login page.
 - PDF report export
 
 ## 📄 License
-MIT (for academic use)
+MIT (for academic use)z

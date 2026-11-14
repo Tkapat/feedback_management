@@ -1,6 +1,5 @@
 export type Role = "student" | "admin";
-export type FeedbackType = "appreciation" | "complaint" | "suggestion";
-export type FeedbackCategory = "teaching" | "classroom" | "laboratory" | "other";
+export type FeedbackCategory = "teaching" | "classroom" | "laboratory" | "faculty" | "library" | "cleanliness" | "other";
 export type FeedbackStatus = "pending" | "in_review" | "resolved" | "rejected";
 
 export interface User {
@@ -40,10 +39,10 @@ export interface Reply {
 export interface Feedback {
   _id: string;
   category: FeedbackCategory;
-  type: FeedbackType;
   rating?: number;
   tags: string[];
   comment: string;
+  images?: string[];
   isAnonymous: boolean;
   status: FeedbackStatus;
   priority: boolean;
@@ -67,7 +66,7 @@ export interface Overview {
   avgRating: number;
   pending: number;
   resolvedPercent: number;
-  byType: { name: FeedbackType; value: number }[];
+  byCategory: { name: FeedbackCategory; value: number }[];
   byStatus: { name: FeedbackStatus; value: number }[];
   monthly: { month: string; count: number }[];
 }
@@ -77,9 +76,6 @@ export interface GroupStat {
   name: string;
   total: number;
   avgRating: number;
-  complaints: number;
-  appreciations: number;
-  suggestions: number;
 }
 
 export interface Settings {

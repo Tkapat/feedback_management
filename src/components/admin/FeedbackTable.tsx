@@ -29,7 +29,6 @@ export default function FeedbackTable({ items, onOpen, onStatusChange, onToggleP
             <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-ink-500">Student</th>
             <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-ink-500">Department</th>
             <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-ink-500">Subject</th>
-            <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-ink-500">Type</th>
             <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-ink-500">Date</th>
             <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-ink-500">Status</th>
             <th className="pb-3 pr-2 text-right text-xs font-semibold uppercase tracking-wider text-ink-500">Actions</th>
@@ -56,7 +55,6 @@ export default function FeedbackTable({ items, onOpen, onStatusChange, onToggleP
               </td>
               <td className="py-3.5 text-sm text-ink-500">{item.department?.name || "—"}</td>
               <td className="py-3.5 text-sm text-ink-500">{item.subject?.name || "—"}</td>
-              <td className="py-3.5 text-sm text-ink-600">{titleCase(item.type)}</td>
               <td className="py-3.5 text-sm text-ink-500">{formatDate(item.createdAt)}</td>
               <td className="py-3.5">
                 <Badge variant={BADGE_VARIANT[item.status as FeedbackStatus] ?? "warning"}>

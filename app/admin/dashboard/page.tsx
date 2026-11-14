@@ -1,6 +1,6 @@
 "use client";
 import KpiCards from "@/components/admin/KpiCards";
-import TypeDonutChart from "@/components/charts/TypeDonutChart";
+import CategoryDonutChart from "@/components/charts/CategoryDonutChart";
 import FacultyRatingBar from "@/components/charts/FacultyRatingBar";
 import DepartmentGroupedBar from "@/components/charts/DepartmentGroupedBar";
 import TrendLineChart from "@/components/charts/TrendLineChart";
@@ -39,17 +39,17 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const complaints = (faculty || [])
-    .filter((f) => f.complaints > 0)
-    .sort((a, b) => b.complaints - a.complaints)
+  const topFaculty = (faculty || [])
+    .filter((f) => f.total > 0)
+    .sort((a, b) => b.total - a.total)
     .slice(0, 5)
-    .map((f) => ({ name: f.name, value: f.complaints }));
+    .map((f) => ({ name: f.name, value: f.total }));
 
-  const appreciations = (faculty || [])
-    .filter((f) => f.appreciations > 0)
-    .sort((a, b) => b.appreciations - a.appreciations)
+  const topDepartment = (departments || [])
+    .filter((d) => d.total > 0)
+    .sort((a, b) => b.total - a.total)
     .slice(0, 5)
-    .map((f) => ({ name: f.name, value: f.appreciations }));
+    .map((d) => ({ name: d.name, value: d.total }));
 
   return (
     <div>
@@ -70,7 +70,7 @@ export default function AdminDashboardPage() {
         <div className="space-y-6 lg:col-span-2">
           <div className="grid gap-6 xl:grid-cols-2">
             <FacultyRatingBar data={(faculty || []).slice(0, 10)} />
-            <TypeDonutChart data={overview.byType} />
+            <CategoryDonutChart data={overview.byCategory} />
           </div>
           <div className="grid gap-6 xl:grid-cols-2">
             <DepartmentGroupedBar data={(departments || []).slice(0, 10)} />
@@ -79,8 +79,8 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <Leaderboard title="Top Faculty — Complaints" items={complaints} empty="No complaints recorded" />
-          <Leaderboard title="Top Faculty — Appreciations" items={appreciations} empty="No appreciations yet" />
+          <Leaderboard title="Top Faculty" items={topFaculty} empty="No feedback recorded" />
+          <Leaderboard title="Top Department" items={topDepartment} empty="No feedback recorded" />
           <Reveal className="card p-5">
             <h3 className="mb-4 font-semibold text-ink-900">Insights</h3>
             <ConcernsCloud tags={concerns?.tags || []} keywords={concerns?.keywords || []} />

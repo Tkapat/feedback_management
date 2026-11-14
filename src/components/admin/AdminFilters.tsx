@@ -9,20 +9,17 @@ interface Props {
 
 export default function AdminFilters({ initial = {}, onFilter }: Props) {
   const [status, setStatus] = useState(initial.status ?? "");
-  const [type, setType] = useState(initial.type ?? "");
   const [department, setDepartment] = useState(initial.department ?? "");
 
   const apply = () => {
     const filters: Record<string, string> = {};
     if (status) filters.status = status;
-    if (type) filters.type = type;
     if (department) filters.department = department;
     onFilter(filters);
   };
 
   const reset = () => {
     setStatus("");
-    setType("");
     setDepartment("");
     onFilter({});
   };
@@ -45,18 +42,6 @@ export default function AdminFilters({ initial = {}, onFilter }: Props) {
         <option value="in_review">In Review</option>
         <option value="resolved">Resolved</option>
         <option value="rejected">Rejected</option>
-      </select>
-
-      <select
-        value={type}
-        onChange={(e) => setType(e.target.value)}
-        className="input w-auto min-w-[150px]"
-        aria-label="Filter by type"
-      >
-        <option value="">All Types</option>
-        <option value="appreciation">Appreciation</option>
-        <option value="complaint">Complaint</option>
-        <option value="suggestion">Suggestion</option>
       </select>
 
       <button

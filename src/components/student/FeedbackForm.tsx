@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import api, { getErrorMessage } from "@/lib/api";
 import useFetch from "@/hooks/useFetch";
 import { feedbackSchema, FeedbackValues } from "@/lib/validators";
-import { CATEGORIES, FEEDBACK_TYPES } from "@/constants/options";
+import { CATEGORIES } from "@/constants/options";
 import type { Department, Settings, Subject } from "@/types";
 import StarRating from "./StarRating";
 import TagSelector from "./TagSelector";
@@ -25,13 +25,16 @@ function Chip({ active, children, onClick }: { active: boolean; children: string
 export default function FeedbackForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const { data: departments } = useFetch<Department[]>("/departments");
   const { data: settings } = useFetch<Settings>("/settings");
 
   const { register, control, watch, setValue, handleSubmit, formState: { errors } } = useForm<FeedbackValues>({
     resolver: zodResolver(feedbackSchema),
-    defaultValues: { category: "teaching", type: "appreciation", department: "", subject: "", faculty: "", tags: [], comment: "", isAnonymous: false },
+    defaultValues: { category: "teaching", department: "", subject: "", faculty: "", tags: [], comment: "", isAnonymous: false },
   });
 
   const category = watch("category");
@@ -47,10 +50,35 @@ export default function FeedbackForm() {
 
   useEffect(() => { setValue("faculty", selectedSubject?.faculty._id ?? ""); }, [selectedSubject, setValue]);
 
+  const onImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    setImageFiles(files);
+    setImagePreviews(files.map((f) => URL.createObjectURL(f)));
+    e.target.value = "";
+  };
+
+  const removeImage = (idx: number) => {
+    URL.revokeObjectURL(imagePreviews[idx]);
+    setImageFiles(imageFiles.filter((_, i) => i !== idx));
+    setImagePreviews(imagePreviews.filter((_, i) => i !== idx));
+  };
+
+  useEffect(() => {
+    return () => { imagePreviews.forEach((u) => URL.revokeObjectURL(u)); };
+  }, [imagePreviews]);
+
   const onSubmit = async (values: FeedbackValues) => {
     setSubmitting(true);
     try {
-      const payload: Partial<FeedbackValues> = { ...values };
+      let images: string[] = [];
+      if (imageFiles.length > 0) {
+        setUploadingImages(true);
+        const formData = new FormData();
+        imageFiles.forEach((f) => formData.append("images", f));
+        const { data } = await api.post("/feedback/upload-images", formData);
+        images = data.data.urls;
+      }
+      const payload = { ...values, images } as FeedbackValues;
       if (!isTeaching) { delete payload.subject; delete payload.faculty; delete payload.rating; }
       await api.post("/feedback", payload);
       toast.success("Feedback submitted. Thank you!");
@@ -59,6 +87,7 @@ export default function FeedbackForm() {
       toast.error(getErrorMessage(e));
     } finally {
       setSubmitting(false);
+      setUploadingImages(false);
     }
   };
 
@@ -75,11 +104,6 @@ export default function FeedbackForm() {
       <Controller name="category" control={control} render={({ field }) => (
         <div><p className="mb-2 text-sm font-medium text-ink-600">Category</p>
           <div className="flex flex-wrap gap-2">{CATEGORIES.map((c) => <Chip key={c.value} active={field.value === c.value} onClick={() => field.onChange(c.value)}>{c.label}</Chip>)}</div></div>
-      )} />
-
-      <Controller name="type" control={control} render={({ field }) => (
-        <div><p className="mb-2 text-sm font-medium text-ink-600">Feedback type</p>
-          <div className="flex flex-wrap gap-2">{FEEDBACK_TYPES.map((t) => <Chip key={t.value} active={field.value === t.value} onClick={() => field.onChange(t.value)}>{t.label}</Chip>)}</div></div>
       )} />
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -130,12 +154,41 @@ export default function FeedbackForm() {
         </div>
       </div>
 
+      <div>
+        <p className="mb-2 text-sm font-medium text-ink-600">Proof images (optional)</p>
+        <label className="block mb-2 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-4 text-center cursor-pointer hover:border-primary-300 hover:bg-primary-50 transition">
+          <input type="file" accept="image/*" multiple onChange={onImagesChange} className="sr-only" />
+          <span className="text-sm font-medium text-ink-600">
+            {imageFiles.length ? `${imageFiles.length} image(s) selected` : "Add photos as proof"}
+          </span>
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {imagePreviews.map((src, i) => (
+            <div key={i} className="relative">
+              <img src={src} alt="preview" className="h-20 w-24 rounded-xl object-cover border border-slate-200" />
+              <button
+                type="button"
+                onClick={() => removeImage(i)}
+                aria-label="Remove image"
+                className="absolute -top-2 -right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+              >
+                <span className="sr-only">Remove</span>
+                <span className="text-[10px]">×</span>
+              </button>
+            </div>
+          ))}
+        </div>
+        {imageFiles.length > 0 && (
+          <p className="mt-2 text-xs text-ink-400">Max 5 images, 5 MB each. Optional proof for your feedback.</p>
+        )}
+      </div>
+
       <label className="flex cursor-pointer items-center gap-3 text-sm text-ink-600">
         <input type="checkbox" className="h-4 w-4 rounded accent-indigo-600" {...register("isAnonymous")} />
         Submit anonymously (hidden from the administrator)
       </label>
 
-      <Button type="submit" loading={submitting} disabled={!!closed} className="w-full sm:w-auto">Submit feedback</Button>
+      <Button type="submit" loading={submitting || uploadingImages} disabled={!!closed || uploadingImages} className="w-full sm:w-auto">Submit feedback</Button>
     </form>
   );
 }

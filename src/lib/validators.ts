@@ -19,8 +19,7 @@ export const registerSchema = z.object({
 export type RegisterValues = z.infer<typeof registerSchema>;
 
 export const feedbackSchema = z.object({
-  category: z.enum(["teaching", "classroom", "laboratory", "other"]),
-  type: z.enum(["appreciation", "complaint", "suggestion"]),
+  category: z.enum(["teaching", "classroom", "laboratory", "faculty", "library", "cleanliness", "other"]),
   department: z.string().min(1, "Select a department"),
   subject: z.string().optional(),
   faculty: z.string().optional(),

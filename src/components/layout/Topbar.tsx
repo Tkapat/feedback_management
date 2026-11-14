@@ -1,6 +1,7 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import { Bell, HelpCircle, Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { titleCase } from "@/lib/utils";
 
 interface Props {
@@ -9,6 +10,11 @@ interface Props {
 
 export default function Topbar({ onOpenMenu }: Props) {
   const { user } = useAuth();
+  const router = useRouter();
+
+  const openNotifications = () => {
+    router.push(user?.role === "admin" ? "/admin/dashboard" : "/student/notifications");
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur">
@@ -39,6 +45,7 @@ export default function Topbar({ onOpenMenu }: Props) {
           </span>
           <button
             aria-label="Notifications"
+            onClick={openNotifications}
             className="relative rounded-xl p-2.5 text-ink-600 transition-colors hover:bg-slate-100 hover:text-primary-600"
           >
             <Bell size={18} />

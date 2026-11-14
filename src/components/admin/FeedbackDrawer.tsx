@@ -3,6 +3,7 @@ import { useState } from "react";
 import Drawer from "@/components/ui/Drawer";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import ImageGallery from "@/components/shared/ImageGallery";
 import { Star, Send } from "lucide-react";
 import { formatDate, titleCase } from "@/lib/utils";
 import type { FeedbackStatus } from "@/types";
@@ -38,7 +39,6 @@ function DrawerContent({ item, onReply, onStatusChange, onTogglePriority }: Omit
         <Badge variant={BADGE_VARIANT[item.status as FeedbackStatus] ?? "warning"}>
           {titleCase(item.status)}
         </Badge>
-        <Badge>{titleCase(item.type)}</Badge>
         {item.priority && (
           <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
             <Star size={11} className="fill-amber-500 text-amber-500" /> Priority
@@ -67,6 +67,7 @@ function DrawerContent({ item, onReply, onStatusChange, onTogglePriority }: Omit
       <section>
         <h4 className="mb-1 text-xs font-semibold uppercase tracking-wider text-ink-500">Comment</h4>
         <p className="rounded-xl bg-slate-50 p-3 text-sm leading-relaxed text-ink-700">{item.comment}</p>
+        <ImageGallery images={item.images} />
         {item.rating ? (
           <p className="mt-2 text-xs font-semibold text-amber-600">★ {item.rating}/5 rating</p>
         ) : null}

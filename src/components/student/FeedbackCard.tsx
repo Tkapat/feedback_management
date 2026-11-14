@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Star, MessageSquare, Clock } from "lucide-react";
 import { STATUS_DOT, STATUS_BADGE } from "@/constants/options";
 import { titleCase, formatDate } from "@/lib/utils";
+import ImageGallery from "@/components/shared/ImageGallery";
 
 export default function FeedbackCard({ item }: { item: any }) {
   const status = item.status as keyof typeof STATUS_DOT;
@@ -21,7 +22,7 @@ export default function FeedbackCard({ item }: { item: any }) {
           </div>
         </div>
         <h3 className="mb-1 text-base font-semibold text-ink-900">
-          {titleCase(item.category)} — {titleCase(item.type)}
+          {titleCase(item.category)}
         </h3>
         {item.subject && (
           <div className="mb-3 flex items-center gap-2">
@@ -30,6 +31,7 @@ export default function FeedbackCard({ item }: { item: any }) {
           </div>
         )}
         <p className="mb-4 line-clamp-2 text-sm text-ink-600">{item.comment}</p>
+        <ImageGallery images={item.images} />
         <div className="flex items-center justify-between border-t border-slate-100 pt-3">
           {item.rating ? (
             <div className="flex items-center gap-1">
