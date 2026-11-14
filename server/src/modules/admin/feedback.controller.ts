@@ -9,7 +9,7 @@ const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export const buildFilter = (q: Request["query"]): FilterQuery<IFeedback> => {
   const f: Record<string, unknown> = {};
-  (["department", "subject", "faculty", "type", "category", "status"] as const).forEach((k) => {
+  (["department", "subject", "faculty", "category", "status"] as const).forEach((k) => {
     if (typeof q[k] === "string" && q[k]) f[k] = q[k];
   });
   if (q.priority === "true") f.priority = true;
@@ -93,11 +93,11 @@ export const exportCsv = asyncHandler(async (req, res) => {
     .populate(populateAll);
 
   const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const header = "Date,Department,Subject,Faculty,Category,Type,Rating,Status,Comment,Student";
+  const header = "Date,Department,Subject,Faculty,Category,Rating,Status,Comment,Student";
   const rows = items.map((f: any) =>
     [
       f.createdAt.toISOString().slice(0, 10), f.department?.name, f.subject?.name, f.faculty?.name,
-      f.category, f.type, f.rating, f.status, f.comment,
+      f.category, f.rating, f.status, f.comment,
       f.isAnonymous ? "Anonymous" : f.student?.name,
     ].map(esc).join(",")
   );

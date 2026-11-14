@@ -11,28 +11,21 @@ const dateMatch = (q: Request["query"]) => {
   return { createdAt: range };
 };
 
-const countIf = (field: string, value: string) => ({
-  $sum: { $cond: [{ $eq: [field, value] }, 1, 0] },
-});
-
 const groupedStats = (groupField: string, collection: string) => (req: Request) =>
   Feedback.aggregate([
     { $match: { ...dateMatch(req.query), [groupField]: { $exists: true, $ne: null } } },
     {
-      $group: {
-        _id: `$${groupField}`,
-        total: { $sum: 1 },
-        avgRating: { $avg: "$rating" },
-        complaints: countIf("$type", "complaint"),
-        appreciations: countIf("$type", "appreciation"),
-        suggestions: countIf("$type", "suggestion"),
-      },
+        $group: {
+          _id: `$${groupField}`,
+          total: { $sum: 1 },
+          avgRating: { $avg: "$rating" },
+        },
     },
     { $lookup: { from: collection, localField: "_id", foreignField: "_id", as: "ref" } },
     { $unwind: "$ref" },
     {
       $project: {
-        name: "$ref.name", total: 1, complaints: 1, appreciations: 1, suggestions: 1,
+        name: "$ref.name", total: 1,
         avgRating: { $round: [{ $ifNull: ["$avgRating", 0] }, 2] },
       },
     },
@@ -51,10 +44,11 @@ export const overview = asyncHandler(async (req, res) => {
         totals: [{
           $group: {
             _id: null, total: { $sum: 1 }, avgRating: { $avg: "$rating" },
-            pending: countIf("$status", "pending"), resolved: countIf("$status", "resolved"),
+            pending: { $sum: { $cond: [{ $eq: ["$status", "pending"] }, 1, 0] } },
+            resolved: { $sum: { $cond: [{ $eq: ["$status", "resolved"] }, 1, 0] } },
           },
         }],
-        byType: [{ $group: { _id: "$type", count: { $sum: 1 } } }],
+        byCategory: [{ $group: { _id: "$category", count: { $sum: 1 } } }],
         byStatus: [{ $group: { _id: "$status", count: { $sum: 1 } } }],
         monthly: [
           { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, count: { $sum: 1 } } },
@@ -72,7 +66,7 @@ export const overview = asyncHandler(async (req, res) => {
       avgRating: Number((t.avgRating || 0).toFixed(2)),
       pending: t.pending,
       resolvedPercent: t.total ? Math.round((t.resolved / t.total) * 100) : 0,
-      byType: r.byType.map((x: any) => ({ name: x._id, value: x.count })),
+      byCategory: r.byCategory.map((x: any) => ({ name: x._id, value: x.count })),
       byStatus: r.byStatus.map((x: any) => ({ name: x._id, value: x.count })),
       monthly: r.monthly.map((x: any) => ({ month: x._id, count: x.count })),
     },
@@ -91,10 +85,8 @@ export const top = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data: {
-      facultyComplaints: topBy(fac, "complaints"),
-      facultyAppreciations: topBy(fac, "appreciations"),
-      departmentComplaints: topBy(dep, "complaints"),
-      departmentAppreciations: topBy(dep, "appreciations"),
+      topFaculty: topBy(fac, "total"),
+      topDepartment: topBy(dep, "total"),
     },
   });
 });
@@ -107,7 +99,7 @@ export const concerns = asyncHandler(async (req, res) => {
       { $group: { _id: "$tags", count: { $sum: 1 } } },
       { $sort: { count: -1 } }, { $limit: 10 },
     ]),
-    Feedback.find({ ...match, type: "complaint" }).select("comment").limit(2000).lean(),
+    Feedback.find({ ...match }).select("comment").limit(2000).lean(),
   ]);
   res.json({
     success: true,

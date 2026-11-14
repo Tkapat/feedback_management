@@ -7,10 +7,10 @@ export interface IFeedback {
   department: Types.ObjectId;
   subject?: Types.ObjectId;
   faculty?: Types.ObjectId;
-  category: "teaching" | "classroom" | "laboratory" | "other";
-  type: "appreciation" | "complaint" | "suggestion";
+  category: "teaching" | "classroom" | "laboratory" | "faculty" | "library" | "cleanliness" | "other";
   rating?: number;
   tags: string[];
+  images: string[];
   comment: string;
   isAnonymous: boolean;
   status: "pending" | "in_review" | "resolved" | "rejected";
@@ -33,11 +33,11 @@ const feedbackSchema = new Schema<IFeedback>(
     department: { type: Schema.Types.ObjectId, ref: "Department", required: true },
     subject: { type: Schema.Types.ObjectId, ref: "Subject" },
     faculty: { type: Schema.Types.ObjectId, ref: "Faculty" },
-    category: { type: String, enum: ["teaching", "classroom", "laboratory", "other"], required: true },
-    type: { type: String, enum: ["appreciation", "complaint", "suggestion"], required: true },
-    rating: { type: Number, min: 1, max: 5 },
-    tags: [{ type: String, trim: true }],
-    comment: { type: String, required: true, trim: true, minlength: 10, maxlength: 1000 },
+  category: { type: String, enum: ["teaching", "classroom", "laboratory", "faculty", "library", "cleanliness", "other"], required: true },
+  rating: { type: Number, min: 1, max: 5 },
+  tags: [{ type: String, trim: true }],
+  images: [{ type: String, trim: true }],
+  comment: { type: String, required: true, trim: true, minlength: 10, maxlength: 1000 },
     isAnonymous: { type: Boolean, default: false },
     status: { type: String, enum: ["pending", "in_review", "resolved", "rejected"], default: "pending" },
     priority: { type: Boolean, default: false },

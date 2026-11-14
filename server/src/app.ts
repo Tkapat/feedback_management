@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
+import path from "node:path";
 import { env } from "./config/env";
 import routes from "./routes";
 import { errorHandler, notFound } from "./middleware/errorHandler";
@@ -11,6 +12,7 @@ app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
 app.use(express.json({ limit: "100kb" }));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use(cookieParser());
 
 app.get("/health", (_req, res) => res.json({ ok: true }));

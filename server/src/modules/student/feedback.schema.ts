@@ -4,13 +4,13 @@ const objectId = z.string().length(24);
 
 export const feedbackSchema = z
   .object({
-    category: z.enum(["teaching", "classroom", "laboratory", "other"]),
-    type: z.enum(["appreciation", "complaint", "suggestion"]),
+    category: z.enum(["teaching", "classroom", "laboratory", "faculty", "library", "cleanliness", "other"]),
     department: objectId,
     subject: objectId.optional(),
     faculty: objectId.optional(),
     rating: z.number().int().min(1).max(5).optional(),
     tags: z.array(z.string().trim().max(30)).max(5).default([]),
+    images: z.array(z.string().url()).optional().default([]),
     comment: z.string().trim().min(10).max(1000),
     isAnonymous: z.boolean().default(false),
   })

@@ -6,6 +6,29 @@ import { HttpError } from "../../utils/HttpError";
 import { getPagination } from "../../utils/pagination";
 import { getSettings, isWindowOpen } from "../../utils/settings";
 import type { FeedbackInput } from "./feedback.schema";
+import multer from "multer";
+import path from "node:path";
+import fs from "node:fs";
+
+const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: UPLOAD_DIR,
+  filename: (_req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${unique}${path.extname(file.originalname)}`);
+  },
+});
+
+export const uploadImages = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req: Express.Request, file: Express.Multer.File, cb: (err: unknown, accept?: boolean) => void) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new HttpError(400, "Only image files are allowed"), false);
+  },
+}).array("images", 5);
 
 const populateRefs = [
   { path: "faculty", select: "name" },
@@ -31,12 +54,12 @@ export const create = asyncHandler(async (req, res) => {
   const feedback = await Feedback.create({
     student: req.user!._id,
     category: body.category,
-    type: body.type,
     department: body.department,
     subject: teaching ? body.subject : undefined,
     faculty: teaching ? body.faculty : undefined,
     rating: teaching ? body.rating : undefined,
     tags: body.tags,
+    images: body.images ?? [],
     comment: body.comment,
     isAnonymous: body.isAnonymous,
     cycle: settings.currentCycle,
@@ -45,11 +68,23 @@ export const create = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, data: feedback });
 });
 
+export const handleUploadImages = asyncHandler(async (req, res) => {
+  await new Promise<void>((resolve, reject) => {
+    uploadImages(req, res, (err: unknown) => {
+      if (err) return reject(err instanceof HttpError ? err : new HttpError(400, String((err as { message?: string }).message ?? err)));
+      resolve();
+    });
+  });
+  const files = (req.files ?? []) as Express.Multer.File[];
+  const base = `${req.protocol}://${req.get("host")}`;
+  const urls = files.map((f) => `${base}/uploads/${f.filename}`);
+  res.json({ success: true, data: { urls } });
+});
+
 export const mine = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query);
   const filter: Record<string, unknown> = { student: req.user!._id };
   if (req.query.status) filter.status = req.query.status;
-  if (req.query.type) filter.type = req.query.type;
 
   const [items, total] = await Promise.all([
     Feedback.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit)

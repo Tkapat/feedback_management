@@ -9,6 +9,7 @@ const router = Router();
 router.use(protect, authorize("student"));
 
 router.post("/", submitLimiter, validate(feedbackSchema), ctrl.create);
+router.post("/upload-images", ctrl.handleUploadImages);
 router.get("/mine", ctrl.mine);
 router.get("/mine/summary", ctrl.summary);
 router.get("/mine/:id", ctrl.getOne);
